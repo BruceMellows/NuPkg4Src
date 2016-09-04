@@ -12,7 +12,9 @@
 
         Tags,
 
-        ////Depends,
+        Dependencies,
+
+        SourceDependencies,
 
         RequireLicenseAcceptance,
 

@@ -13,6 +13,7 @@ namespace NuPkg4Src
     using System.IO;
     using System.Linq;
     using System.Text;
+    using System.Text.RegularExpressions;
     using System.Xml.Linq;
 
     internal class Program
@@ -20,8 +21,11 @@ namespace NuPkg4Src
         private readonly static HashSet<SourceConfigurationOptionType> excludedFromMetadata = new HashSet<SourceConfigurationOptionType>
         {
             SourceConfigurationOptionType.Hash,
-            SourceConfigurationOptionType.ContentPath
+            SourceConfigurationOptionType.ContentPath,
+            SourceConfigurationOptionType.SourceDependencies,
         };
+
+        private static readonly Regex DependencyRegex = new Regex(@"^(?<versionRange>[^,]+,[^,]+),(?<dependency>.*)$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         private const string NuspecNamespaceText = "http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd";
 
@@ -40,9 +44,25 @@ namespace NuPkg4Src
             foreach (var option in options.Where(x => !excludedFromMetadata.Contains(x.OptionType)))
             {
                 var name = option.OptionType.ToString();
-                yield return new XElement(
-                    NuspecNamespace + name.Substring(0, 1).ToLowerInvariant() + name.Substring(1),
-                    option.Value);
+
+                if (option.OptionType == SourceConfigurationOptionType.Dependencies)
+                {
+                    yield return new XElement(
+                        NuspecNamespace + name.Substring(0, 1).ToLowerInvariant() + name.Substring(1),
+                        option.Value
+                            .Split(' ')
+                            .Select(x => DependencyRegex.Matches(option.Value)[0])
+                            .Select(x => new XElement(
+                                NuspecNamespace + "dependency",
+                                new XAttribute("id", x.Groups["dependency"].Value),
+                                new XAttribute("version", x.Groups["versionRange"].Value))));
+                }
+                else
+                {
+                    yield return new XElement(
+                        NuspecNamespace + name.Substring(0, 1).ToLowerInvariant() + name.Substring(1),
+                        option.Value);
+                }
             }
         }
 
@@ -131,7 +151,10 @@ namespace NuPkg4Src
                     .Where(x => x != null)
                     .ToList();
 
-                //// FIXME - here we can update the dependency versions, check hashes, etc
+                sourceFiles.ForEach(x => x.UpdateDependencies(
+                        sourceFiles.ToDictionary(
+                            y => y.SourceConfigurationOptions.Single(z => z.OptionType == SourceConfigurationOptionType.Id).Value,
+                            y => y)));
 
                 sourceFiles.ForEach(x => CreateNuPkg(commandLineOptions, x));
             }

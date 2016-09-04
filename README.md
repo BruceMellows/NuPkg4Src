@@ -24,4 +24,3 @@ If the source file hash does not match the content, the version is updated (+1 b
 ## Todo
 
 * Proper Documentation
-* NuGet Depends

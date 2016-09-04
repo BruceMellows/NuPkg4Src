@@ -122,5 +122,44 @@
         public IEnumerable<SourceConfigurationOption> SourceConfigurationOptions { get; private set; }
 
         public string FullPath { get { return Path.Combine(this.BasePath, this.RelativePath); } }
+
+        public void UpdateDependencies(Dictionary<string, SourceFile> sourceFileLookup)
+        {
+            var sourceDependencyIds = this.SourceConfigurationOptions
+                .Where(x => x.OptionType == SourceConfigurationOptionType.SourceDependencies)
+                .Select(x => x.Value.Split(' '))
+                .SelectMany(x => x)
+                .ToList();
+
+            var sourceDependencies = sourceDependencyIds
+                .Select(x => sourceFileLookup[x].SourceConfigurationOptions)
+                .Select(x =>
+                {
+                    var version = Version.Parse(x.Single(y => y.OptionType == SourceConfigurationOptionType.Version).Value);
+
+                    return string.Format(
+                    "[{0},{1}),{2}",
+                    version,
+                    new Version(version.Major, version.Minor + 1),
+                    x.Single(y => y.OptionType == SourceConfigurationOptionType.Id).Value);
+                })
+                .ToList();
+
+            var dependencies = string.Join(
+                " ",
+                this.SourceConfigurationOptions
+                    .Where(x => x.OptionType == SourceConfigurationOptionType.Dependencies)
+                    .Select(x => x.Value.Split(' '))
+                    .SelectMany(x => x)
+                    .Concat(sourceDependencies));
+
+            if (!string.IsNullOrEmpty(dependencies))
+            {
+                this.SourceConfigurationOptions = this.SourceConfigurationOptions
+                   .Where(x => x.OptionType != SourceConfigurationOptionType.Dependencies)
+                   .Concat(new[] { new SourceConfigurationOption(SourceConfigurationOptionType.Dependencies, dependencies) })
+                   .ToList();
+            }
+        }
     }
 }

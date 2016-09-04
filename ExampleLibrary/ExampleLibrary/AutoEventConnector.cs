@@ -3,6 +3,7 @@
 // NuPkg4Src-Tags: CSharp Source Auto Event Connector Extension
 // NuPkg4Src-Id: ExampleLibrary.AutoEventConnector.Extension
 // NuPkg4Src-ContentPath: ExampleLibrary
+// NuPkg4Src-SourceDependencies: ExampleLibrary.StaticTuple
 // NuPkg4Src-Hash: SHA512Managed:0580A5CAEDE7FDADED61B57BC70E2340E88E434696383DCDE0FD1F906895258D47881D09D51B6B064D762426F580D5BF6BADE3182AC40D521D8FAB884FEED1BE
 // NuPkg4Src-Version: 1.0.0
 // There is no copyright, you can use and abuse this source without limit.
