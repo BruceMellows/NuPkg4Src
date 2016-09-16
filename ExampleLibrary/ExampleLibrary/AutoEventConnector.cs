@@ -1,10 +1,11 @@
-﻿// NuPkg4Src-Authors: Bruce Mellows
+// NuPkg4Src-Authors: Bruce Mellows
 // NuPkg4Src-Description: Provides a mechanism to automatically connect an event handler with an event source (using reflected naming)
 // NuPkg4Src-Tags: CSharp Source Auto Event Connector Extension
 // NuPkg4Src-Id: ExampleLibrary.AutoEventConnector.Extension
 // NuPkg4Src-ContentPath: ExampleLibrary
-// NuPkg4Src-SourceDependencies: ExampleLibrary.StaticTuple
-// NuPkg4Src-Hash: SHA512Managed:0580A5CAEDE7FDADED61B57BC70E2340E88E434696383DCDE0FD1F906895258D47881D09D51B6B064D762426F580D5BF6BADE3182AC40D521D8FAB884FEED1BE
+// NuPkg4Src-InternalSourceDependencies: ExampleLibrary.StaticTuple
+// NuPkg4Src-MakePublic: AutoEventConnector
+// NuPkg4Src-Hash: SHA512Managed:62F2F35728E552DF101CA597A5DFB6F68C4CE6DA1A2B1493D1046A8FA318DE30A2876D835D2F66B11D8A7E23B3BF2BC87C201463B9EB84CB00DD54BFA73E7852
 // NuPkg4Src-Version: 1.0.0
 // There is no copyright, you can use and abuse this source without limit.
 // There is no warranty, you are responsible for the consequences of your use of this source.
@@ -16,11 +17,10 @@ namespace System
     using System.Linq;
     using System.Reflection;
 
-    using ExampleLibrary;
-
     internal static class AutoEventConnector
     {
-        private static Dictionary<StaticTuple<Type, Type>, List<AttachDetach>> cache = new Dictionary<StaticTuple<Type, Type>, List<AttachDetach>>();
+        private static Dictionary<ExampleLibrary.StaticTuple<Type, Type>, List<AttachDetach>> cache
+            = new Dictionary<ExampleLibrary.StaticTuple<Type, Type>, List<AttachDetach>>();
 
         internal static int CacheCount
         {
@@ -54,7 +54,7 @@ namespace System
             var subMethods = subType.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic);
             var pubType = pub.GetType();
             var pubEvents = pubType.GetEvents();
-            var cacheKey = StaticTuple.Create(pubType, subType);
+            var cacheKey = ExampleLibrary.StaticTuple.Create(pubType, subType);
             List<AttachDetach> cacheValue;
             if (!cache.TryGetValue(cacheKey, out cacheValue))
             {
@@ -85,9 +85,9 @@ namespace System
                     }
                 }
 
-                if (!cache.ContainsKey(cacheKey))
+                var newCache = cache.ToList().ToDictionary(x => x.Key, x => x.Value);
+                if (!newCache.ContainsKey(cacheKey))
                 {
-                    var newCache = cache.ToDictionary(x => x.Key, x => x.Value);
                     newCache[cacheKey] = cacheValue;
                     cache = newCache;
                 }

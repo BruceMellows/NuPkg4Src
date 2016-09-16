@@ -1,9 +1,10 @@
-﻿// NuPkg4Src-Authors: Bruce Mellows
+// NuPkg4Src-Authors: Bruce Mellows
 // NuPkg4Src-Description: Provides a tuple a static type (that can be safely compared using reference equals)
 // NuPkg4Src-Tags: CSharp Source Static Tuple
 // NuPkg4Src-Id: ExampleLibrary.StaticTuple
 // NuPkg4Src-ContentPath: ExampleLibrary
-// NuPkg4Src-Hash: SHA512Managed:0204D3794253CDA2A87EC0A4BECB5EB38203DD091A844EC3D04D1DD9A3A243D5FF9C4D557732AB93C6C274067201EAC5E907CFF074D40264E21540CEA280D135
+// NuPkg4Src-MakePublic: StaticTuple
+// NuPkg4Src-Hash: SHA512Managed:419919B6521A9C196B6FE11ED4CB28103B3B4BBB4B0F5CFE81BB85576E0B3479C3894AFB7E1DB329792F9D9E801531DA5C98C2F918E3BEFFE06DAF6214E4937B
 // NuPkg4Src-Version: 1.0.0
 // There is no copyright, you can use and abuse this source without limit.
 // There is no warranty, you are responsible for the consequences of your use of this source.
@@ -23,7 +24,7 @@ namespace ExampleLibrary
         }
     }
 
-    public sealed class StaticTuple<TItem1, TItem2> : IEquatable<StaticTuple<TItem1, TItem2>>
+    internal sealed class StaticTuple<TItem1, TItem2> : IEquatable<StaticTuple<TItem1, TItem2>>
         where TItem1 : class
         where TItem2 : class
     {

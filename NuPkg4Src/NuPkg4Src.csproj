@@ -43,7 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="System.Text.RegularExpressions.Extensions.CaptureList.cs" />
     <Compile Include="CommandLineOptions.cs" />
+    <Compile Include="NuPkg.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SourceConfigurationOption.cs" />
@@ -54,7 +56,8 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>mkdir "$(SolutionDir)Media"
-copy /y "$(TargetPath)" "$(SolutionDir)Media\$(TargetFileName)"</PostBuildEvent>
+copy /y "$(TargetPath)" "$(SolutionDir)Media\$(TargetFileName)"
+"$(SolutionDir)NuPkg4Src\bin\$(ConfigurationName)\NuPkg4Src.exe" "-NugetPath=$(SolutionDir)Media\nuget.exe" "-OutputDirectory=$(SolutionDir)Media" "$(ProjectDir)."</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

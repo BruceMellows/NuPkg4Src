@@ -17,18 +17,34 @@ namespace NuPkg4Src
     {
         private readonly static HashSet<SourceConfigurationOptionType> excludedFromSourceUpdate = new HashSet<SourceConfigurationOptionType>
         {
-            // SourceConfigurationOptionType.Id
+            SourceConfigurationOptionType.Variant,
+        };
+
+        private readonly static HashSet<SourceConfigurationOptionType> excludedFromSourceRead = new HashSet<SourceConfigurationOptionType>
+        {
+            SourceConfigurationOptionType.Variant,
+            SourceConfigurationOptionType.Error,
         };
 
         private static readonly Regex OptionRegex = new Regex(
             @"^\s*// NuPkg4Src-(?<option>\w+):\s+(?<value>.*)",
             RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
+        private const string regexPartIdentifier = @"(?<identifier>[a-zA-Z_][a-zA-Z0-9_]*)";
+        private const string regexPartModifiers = @"((?<modifier>new|public|protected|internal|private|abstract|sealed|static)\s+)+";
+        private const string regexPartPartialOpt = @"((?<partial>partial)\s+)?";
+        private const string regexPartClass = @"(?<class>class)\s+";
+        private const string regexPartClassName = "(?<className>" + regexPartIdentifier + @")\s*";
+        private const string regexPartGenericType = @"(?<genericType>" + regexPartIdentifier + @")\s*";
+        private const string regexPartGenerics = @"(?<generics><\s*" + regexPartGenericType + @"(,\s*" + regexPartGenericType + @")*>)?\s*";
+
+        private static readonly Regex ClassRegex = new Regex(@"^\s*" + regexPartModifiers + regexPartPartialOpt + regexPartClass + regexPartClassName + regexPartGenerics + ".*$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
         private SourceFile()
         {
         }
 
-        public static SourceFile FromFullPath(string basePath, string fullPath)
+        public static IEnumerable<SourceFile> FromFullPath(string basePath, string fullPath)
         {
             basePath = Path.GetFullPath(basePath);
             fullPath = Path.GetFullPath(fullPath);
@@ -40,7 +56,7 @@ namespace NuPkg4Src
             var options = matchedLines
                 .TakeWhile(x => x.Item2.Count == 1)
                 .Select(x => new SourceConfigurationOption(x.Item2[0].Groups["option"].Value, x.Item2[0].Groups["value"].Value))
-                .Where(x => x.OptionType != SourceConfigurationOptionType.Error)
+                .Where(x => !excludedFromSourceRead.Contains(x.OptionType))
                 .ToList();
 
             // add the Id if it does not have one
@@ -68,53 +84,104 @@ namespace NuPkg4Src
                 }
                 : null;
 
-            if (sourceFile != null)
+            if (sourceFile == null)
             {
-                // if it does not contain a hash or the has is wrong - update the source file
-                var hashOptions = sourceFile.SourceConfigurationOptions.Where(x => x.OptionType == SourceConfigurationOptionType.Hash).ToArray();
-                var noHash = hashOptions.Length == 0;
-                var hashWrong = !noHash && hashOptions.Any(x => x.Value != hashText);
-                if (addId || noHash || hashWrong)
-                {
-                    sourceFile.SourceConfigurationOptions =
-                        sourceFile
-                            .SourceConfigurationOptions
-                            .Where(x => x.OptionType != SourceConfigurationOptionType.Hash)
-                            .Concat(new[] { new SourceConfigurationOption(SourceConfigurationOptionType.Hash, sourceFile.Hash) })
-                            .ToArray();
-
-                    var version = sourceFile.SourceConfigurationOptions
-                            .Where(x => x.OptionType == SourceConfigurationOptionType.Version)
-                            .Select(x => Version.Parse(x.Value))
-                            .SingleOrDefault();
-
-                    if (hashWrong)
-                    {
-                        version = version != null
-                            ? new Version(version.Major, version.Minor, version.Build + 1)
-                            : new Version(1, 0, 0);
-                    }
-                    else if (version == null)
-                    {
-                        version = new Version(1, 0, 0);
-                    }
-
-                    sourceFile.SourceConfigurationOptions =
-                        sourceFile.SourceConfigurationOptions
-                            .Where(x => x.OptionType != SourceConfigurationOptionType.Version)
-                            .Concat(new[] { new SourceConfigurationOption(SourceConfigurationOptionType.Version, version.ToString()) })
-                            .ToArray();
-
-                    File.WriteAllLines(
-                        fullPath,
-                        sourceFile.SourceConfigurationOptions
-                            .Where(x => !excludedFromSourceUpdate.Contains(x.OptionType))
-                            .Select(x => string.Format(CultureInfo.InvariantCulture, "// NuPkg4Src-{0}: {1}", x.OptionType, x.Value))
-                            .Concat(sourceFile.Lines));
-                }
+                yield break;
             }
 
-            return sourceFile;
+            // if it does not contain a hash or the has is wrong - update the source file
+            var hashOptions = sourceFile.SourceConfigurationOptions.Where(x => x.OptionType == SourceConfigurationOptionType.Hash).ToArray();
+            var noHash = hashOptions.Length == 0;
+            var hashWrong = !noHash && hashOptions.Any(x => x.Value != hashText);
+            if (addId || noHash || hashWrong)
+            {
+                sourceFile.SourceConfigurationOptions =
+                    sourceFile
+                        .SourceConfigurationOptions
+                        .Where(x => x.OptionType != SourceConfigurationOptionType.Hash)
+                        .Concat(new[] { new SourceConfigurationOption(SourceConfigurationOptionType.Hash, sourceFile.Hash) })
+                        .ToArray();
+
+                var version = sourceFile.SourceConfigurationOptions
+                        .Where(x => x.OptionType == SourceConfigurationOptionType.Version)
+                        .Select(x => Version.Parse(x.Value))
+                        .SingleOrDefault();
+
+                if (hashWrong)
+                {
+                    version = version != null
+                        ? new Version(version.Major, version.Minor, version.Build + 1)
+                        : new Version(1, 0, 0);
+                }
+                else if (version == null)
+                {
+                    version = new Version(1, 0, 0);
+                }
+
+                sourceFile.SourceConfigurationOptions =
+                    sourceFile.SourceConfigurationOptions
+                        .Where(x => x.OptionType != SourceConfigurationOptionType.Version)
+                        .Concat(new[] { new SourceConfigurationOption(SourceConfigurationOptionType.Version, version.ToString()) })
+                        .ToArray();
+
+                File.WriteAllLines(
+                    fullPath,
+                    sourceFile.SourceConfigurationOptions
+                        .Where(x => !excludedFromSourceUpdate.Contains(x.OptionType))
+                        .Select(x => string.Format(CultureInfo.InvariantCulture, "// NuPkg4Src-{0}: {1}", x.OptionType, x.Value))
+                        .Concat(sourceFile.Lines));
+            }
+
+            yield return sourceFile;
+
+            var makePublicClassNames = new HashSet<string>(
+                sourceFile.SourceConfigurationOptions
+                    .Where(x => x.OptionType == SourceConfigurationOptionType.MakePublic)
+                    .SelectMany(x => x.Value.Split(' ').Where(y => !string.IsNullOrWhiteSpace(y))));
+
+            var makePublicPatches = sourceFile.Lines
+                .Select(line => Tuple.Create(line, ClassRegex.Matches(line)))
+                .Where(x => x.Item2.Count != 0 && makePublicClassNames.Contains(x.Item2[0].Groups["className"].Value))
+                .Select(x => Tuple.Create(x.Item1, x.Item2[0].CaptureList("modifier").SingleOrDefault(y => y.Value == "internal" || y.Value == "private")))
+                .Select(x => Tuple.Create(x.Item1, x.Item2 != null ? x.Item1.Substring(0, x.Item2.Index) + "public" + x.Item1.Substring(x.Item2.Index + x.Item2.Length) : string.Empty))
+                .ToDictionary(x => x.Item1, x => x.Item2);
+
+            ////var options = sourceFile.SourceConfigurationOptions.ToArray();
+            var patched = false;
+            var patchedSourceFile = new SourceFile
+            {
+                BasePath = sourceFile.BasePath,
+                RelativePath = sourceFile.RelativePath,
+                Lines = sourceFile.Lines.Select(x =>
+                {
+                    var key = makePublicPatches.Keys.SingleOrDefault(y => string.Equals(x, y));
+                    if (key == null)
+                    {
+                        return x;
+                    }
+
+                    // FIXME - update options.ID
+                    patched = true;
+                    return makePublicPatches[key];
+                }).ToList(),
+                Hash = sourceFile.Hash,
+                SourceConfigurationOptions = sourceFile.SourceConfigurationOptions,
+            };
+
+            if (patched)
+            {
+                var idOption = new SourceConfigurationOption(
+                            SourceConfigurationOptionType.Id,
+                            patchedSourceFile.SourceConfigurationOptions
+                                .Single(x => x.OptionType == SourceConfigurationOptionType.Id).Value + ".public");
+                var variantOption = new SourceConfigurationOption(SourceConfigurationOptionType.Variant, "public");
+                patchedSourceFile.SourceConfigurationOptions = patchedSourceFile.SourceConfigurationOptions
+                    .Where(x => x.OptionType != SourceConfigurationOptionType.Id && x.OptionType != SourceConfigurationOptionType.Variant)
+                    .Concat(new[] { idOption, variantOption })
+                    .ToList();
+
+                yield return patchedSourceFile;
+            }
         }
 
         public string BasePath { get; private set; }
@@ -129,15 +196,30 @@ namespace NuPkg4Src
 
         public string FullPath { get { return Path.Combine(this.BasePath, this.RelativePath); } }
 
+        public string GetOption(SourceConfigurationOptionType optionType)
+        {
+            var option = this.SourceConfigurationOptions.SingleOrDefault(x => x.OptionType == optionType);
+            return option != null ? option.Value : null;
+        }
+
         public void UpdateDependencies(Dictionary<string, SourceFile> sourceFileLookup)
         {
-            var sourceDependencyIds = this.SourceConfigurationOptions
-                .Where(x => x.OptionType == SourceConfigurationOptionType.SourceDependencies)
+            var internalSourceDependencyIds = this.SourceConfigurationOptions
+                .Where(x => x.OptionType == SourceConfigurationOptionType.InternalSourceDependencies)
                 .Select(x => x.Value.Split(' '))
                 .SelectMany(x => x)
                 .ToList();
 
-            var sourceDependencies = sourceDependencyIds
+            var variant = this.GetOption(SourceConfigurationOptionType.Variant);
+
+            var externalSourceDependencyIds = this.SourceConfigurationOptions
+                .Where(x => x.OptionType == SourceConfigurationOptionType.ExternalSourceDependencies)
+                .Select(x => x.Value.Split(' ').Select(y => !string.IsNullOrEmpty(variant) ? string.Join(".", y, variant) : y))
+                .SelectMany(x => x)
+                .ToList();
+
+            var sourceDependencies = internalSourceDependencyIds
+                .Concat(externalSourceDependencyIds)
                 .Select(x => sourceFileLookup[x].SourceConfigurationOptions)
                 .Select(x =>
                 {

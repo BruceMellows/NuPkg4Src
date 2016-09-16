@@ -20,13 +20,19 @@ namespace NuPkg4Src
 
         Dependencies,
 
-        SourceDependencies,
+        InternalSourceDependencies,
+
+        ExternalSourceDependencies,
 
         RequireLicenseAcceptance,
 
         ContentPath,
 
         Hash,
+
+        MakePublic,
+
+        Variant,
 
         Error
     }
