@@ -146,7 +146,6 @@ namespace NuPkg4Src
                 .Select(x => Tuple.Create(x.Item1, x.Item2 != null ? x.Item1.Substring(0, x.Item2.Index) + "public" + x.Item1.Substring(x.Item2.Index + x.Item2.Length) : string.Empty))
                 .ToDictionary(x => x.Item1, x => x.Item2);
 
-            ////var options = sourceFile.SourceConfigurationOptions.ToArray();
             var patched = false;
             var patchedSourceFile = new SourceFile
             {
@@ -160,7 +159,6 @@ namespace NuPkg4Src
                         return x;
                     }
 
-                    // FIXME - update options.ID
                     patched = true;
                     return makePublicPatches[key];
                 }).ToList(),

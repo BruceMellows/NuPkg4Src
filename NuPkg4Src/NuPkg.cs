@@ -101,8 +101,6 @@ namespace NuPkg4Src
                 document.Save(writer);
             }
 
-            var nuspecContent = File.ReadAllLines(outputFilename);
-
             // launch nuspec creator
             var nugetExe = commandLineOptions.NugetPath;
             if (!string.IsNullOrEmpty(nugetExe))
