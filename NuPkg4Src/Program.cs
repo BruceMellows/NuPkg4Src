@@ -34,6 +34,7 @@ namespace NuPkg4Src
                             y => y.SourceConfigurationOptions.Single(z => z.OptionType == SourceConfigurationOptionType.Id).Value,
                             y => y)));
 
+                // FIXME - can do this in parallel
                 sourceFiles.ForEach(x => NuPkg.Create(commandLineOptions, x));
             }
         }

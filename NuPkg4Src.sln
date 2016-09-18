@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleLibrary", "ExampleLi
 		{CDA73062-562C-4E1F-A145-F15B543374FC} = {CDA73062-562C-4E1F-A145-F15B543374FC}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PInvoke", "PInvoke\PInvoke.csproj", "{39D62DDE-10E6-4B51-84AB-8F8CAB792754}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = NuPkg4Src.vsmdi
@@ -48,6 +50,16 @@ Global
 		{D05BA428-7756-4CCA-8395-BD2A2CF45DF0}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{D05BA428-7756-4CCA-8395-BD2A2CF45DF0}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{D05BA428-7756-4CCA-8395-BD2A2CF45DF0}.Release|x86.ActiveCfg = Release|Any CPU
+		{39D62DDE-10E6-4B51-84AB-8F8CAB792754}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39D62DDE-10E6-4B51-84AB-8F8CAB792754}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39D62DDE-10E6-4B51-84AB-8F8CAB792754}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{39D62DDE-10E6-4B51-84AB-8F8CAB792754}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{39D62DDE-10E6-4B51-84AB-8F8CAB792754}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{39D62DDE-10E6-4B51-84AB-8F8CAB792754}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39D62DDE-10E6-4B51-84AB-8F8CAB792754}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39D62DDE-10E6-4B51-84AB-8F8CAB792754}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{39D62DDE-10E6-4B51-84AB-8F8CAB792754}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{39D62DDE-10E6-4B51-84AB-8F8CAB792754}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

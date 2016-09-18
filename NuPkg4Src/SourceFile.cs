@@ -132,6 +132,8 @@ namespace NuPkg4Src
                         .Concat(sourceFile.Lines));
             }
 
+            // FIXME - probably should not yield return sourceFile when the above write-back was not required
+            // FIXME - how can we tell if the variants need to be yield returned or not
             yield return sourceFile;
 
             var makePublicClassNames = new HashSet<string>(

@@ -6,11 +6,11 @@
     <ProductVersion>
     </ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{D05BA428-7756-4CCA-8395-BD2A2CF45DF0}</ProjectGuid>
+    <ProjectGuid>{39D62DDE-10E6-4B51-84AB-8F8CAB792754}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ExampleLibrary</RootNamespace>
-    <AssemblyName>ExampleLibrary</AssemblyName>
+    <RootNamespace>PInvoke</RootNamespace>
+    <AssemblyName>PInvoke</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -45,21 +45,26 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExampleLibrary\AutoDisposable.cs" />
-    <Compile Include="ExampleLibrary\AutoEventConnector.cs" />
-    <Compile Include="ExampleLibrary\AutoPropertyCopy.cs" />
-    <Compile Include="ExampleLibrary\Crc16.cs" />
-    <Compile Include="ExampleLibrary\TaskWaiter.cs" />
+    <Compile Include="dbghelp\MiniDumpWriteDump.cs" />
+    <Compile Include="dbghelp\MINIDUMP_EXCEPTION_INFORMATION.cs" />
+    <Compile Include="dbghelp\UnDecorateFlags.cs" />
+    <Compile Include="dbghelp\UnDecorateSymbolName.cs" />
+    <Compile Include="iphlpapi\GetExtendedTcpTable.cs" />
+    <Compile Include="iphlpapi\MIB_TCP6ROW_OWNER_PID.cs" />
+    <Compile Include="iphlpapi\MIB_TCP6TABLE_OWNER_PID.cs" />
+    <Compile Include="iphlpapi\MIB_TCPROW_OWNER_PID.cs" />
+    <Compile Include="iphlpapi\MIB_TCPTABLE_OWNER_PID.cs" />
+    <Compile Include="iphlpapi\MIB_TCP_STATE.cs" />
+    <Compile Include="iphlpapi\TCP_TABLE_CLASS.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tests\AutoEventConnectorTests.cs" />
-    <Compile Include="ExampleLibrary\StaticTuple.cs" />
-    <Compile Include="Tests\AutoPropertyCopyTests.cs" />
-    <Compile Include="Tests\StaticTupleTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="kernel32\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>mkdir "$(SolutionDir)Media\ExampleLibrary"
-"$(SolutionDir)NuPkg4Src\bin\$(ConfigurationName)\NuPkg4Src.exe" "-NugetPath=$(SolutionDir)Media\nuget.exe" "-OutputDirectory=$(SolutionDir)Media\ExampleLibrary" "$(ProjectDir)."</PostBuildEvent>
+    <PostBuildEvent>mkdir "$(SolutionDir)Media\PInvoke"
+"$(SolutionDir)NuPkg4Src\bin\$(ConfigurationName)\NuPkg4Src.exe" "-NugetPath=$(SolutionDir)Media\nuget.exe" "-OutputDirectory=$(SolutionDir)Media\PInvoke" "$(ProjectDir)."</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
