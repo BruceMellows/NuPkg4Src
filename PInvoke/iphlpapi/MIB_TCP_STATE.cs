@@ -1,7 +1,7 @@
 // NuPkg4Src-Authors: www.pinvoke.net
 // NuPkg4Src-Description: enum MIB_TCP_STATE
 // NuPkg4Src-Tags: CSharp Source MIB TCP STATE iphlpapi pinvoke
-// NuPkg4Src-Id: PInvoke.dbghelp.MIB_TCP_STATE
+// NuPkg4Src-Id: PInvoke.iphlpapi.MIB_TCP_STATE
 // NuPkg4Src-ContentPath: PInvoke.iphlpapi
 // NuPkg4Src-Hash: SHA512Managed:7B624549AE6FCF4A6312A6BFBBA2F6B239589C6091AF2F0AD32E473D7A4A88DFB84B37B0F59B5047E4C558B8E6162954BF9D5A4D54A6EB990899F9DC09F6F487
 // NuPkg4Src-Version: 1.0.0

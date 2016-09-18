@@ -1,7 +1,7 @@
 // NuPkg4Src-Authors: www.pinvoke.net
 // NuPkg4Src-Description: struct MIB_TCP6ROW_OWNER_PID
 // NuPkg4Src-Tags: CSharp Source MIB TCP6ROW OWNER PID iphlpapi pinvoke
-// NuPkg4Src-Id: PInvoke.dbghelp.MIB_TCP6ROW_OWNER_PID
+// NuPkg4Src-Id: PInvoke.iphlpapi.MIB_TCP6ROW_OWNER_PID
 // NuPkg4Src-ContentPath: PInvoke.iphlpapi
 // NuPkg4Src-Hash: SHA512Managed:94638611CDFFD606B50D9D63AA5C0B554A4839DDCE84C338A690D3508C4FBF8E35041487E141D99DAECC0CFBB2DADD20D0B8F16F5D7F002065EA079933E7F127
 // NuPkg4Src-Version: 1.0.0

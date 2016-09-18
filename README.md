@@ -24,3 +24,4 @@ If the source file hash does not match the content, the version is updated (+1 b
 ## Todo
 
 * Proper Documentation
+* Better error handling and reporting (currectly just exception traces - yuck)
