@@ -130,6 +130,8 @@ namespace NuPkg4Src
                         .Where(x => !excludedFromSourceUpdate.Contains(x.OptionType))
                         .Select(x => string.Format(CultureInfo.InvariantCulture, "// NuPkg4Src-{0}: {1}", x.OptionType, x.Value))
                         .Concat(sourceFile.Lines));
+
+                sourceFile.LastWriteTimeUtc = new FileInfo(fullPath).LastWriteTimeUtc;
             }
 
             // FIXME - probably should not yield return sourceFile when the above write-back was not required
@@ -166,6 +168,7 @@ namespace NuPkg4Src
                 }).ToList(),
                 Hash = sourceFile.Hash,
                 SourceConfigurationOptions = sourceFile.SourceConfigurationOptions,
+                LastWriteTimeUtc = sourceFile.LastWriteTimeUtc,
             };
 
             if (patched)
@@ -195,6 +198,8 @@ namespace NuPkg4Src
         public IEnumerable<SourceConfigurationOption> SourceConfigurationOptions { get; private set; }
 
         public string FullPath { get { return Path.Combine(this.BasePath, this.RelativePath); } }
+
+        public DateTime LastWriteTimeUtc { get; private set; }
 
         public string GetOption(SourceConfigurationOptionType optionType)
         {
