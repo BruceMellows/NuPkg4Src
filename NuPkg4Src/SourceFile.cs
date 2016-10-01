@@ -176,9 +176,6 @@ namespace NuPkg4Src
             }
 
             var lines = matchedLines.Where(x => x.Item2.Count != 1).Select(x => x.Item1).ToArray();
-            var sha512 = System.Security.Cryptography.SHA512.Create();
-            var hash = sha512.ComputeHash(System.Text.Encoding.UTF8.GetBytes((string.Join(Environment.NewLine, lines))));
-            var hashText = sha512.GetType().Name + ':' + BitConverter.ToString(hash).Replace("-", string.Empty);
 
             var sourceFile = isAssociatedSource || options.Count > 1
                 ? new SourceFile
@@ -187,7 +184,6 @@ namespace NuPkg4Src
                     RelativePath = fullPath.Substring(basePath.Length + 1),
                     SourceConfigurationOptions = options,
                     Lines = lines,
-                    Hash = hashText,
                     LastWriteTimeUtc = new FileInfo(fullPath).LastWriteTimeUtc,
                     AssociatedSources = getAssociatedSources(),
                 }
@@ -197,6 +193,12 @@ namespace NuPkg4Src
             {
                 yield break;
             }
+
+            var sourceFiles = sourceFile.GetAll().ToList();
+            var sha512 = System.Security.Cryptography.SHA512.Create();
+            var hash = sha512.ComputeHash(System.Text.Encoding.UTF8.GetBytes((string.Join(Environment.NewLine, sourceFiles.Select(x => x.Lines).SelectMany(x => x)))));
+            var hashText = sha512.GetType().Name + ':' + BitConverter.ToString(hash).Replace("-", string.Empty);
+            sourceFile.Hash = hashText;
 
             // if the source has the markup that identifies it as a SourceFile (!isAssociatedSource)
             // AND does not contain a hash

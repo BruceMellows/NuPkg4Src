@@ -37,7 +37,7 @@ namespace NuPkg4Src
         public static void Create(CommandLineOptions commandLineOptions, SourceFile sourceFile)
         {
             var tempFiles = new List<string>();
-            var sourceFiles = EnumerateSourceFiles(sourceFile).ToList();
+            var sourceFiles = sourceFile.GetAll().ToList();
 
             var id = sourceFile.SourceConfigurationOptions.Single(x => x.OptionType == SourceConfigurationOptionType.Id).Value;
             var nuspecFilename = Path.Combine(commandLineOptions.TempPath, id + ".nuspec");
@@ -45,7 +45,7 @@ namespace NuPkg4Src
             var version = sourceFile.SourceConfigurationOptions.Single(x => x.OptionType == SourceConfigurationOptionType.Version).Value;
             var nupkgFilename = Path.Combine(commandLineOptions.OutputPath, id + "." + version + ".nupkg");
 
-            if (!File.Exists(nupkgFilename) || new FileInfo(nupkgFilename).LastWriteTimeUtc <= LastWriteTimeUtc(sourceFile))
+            if (!File.Exists(nupkgFilename) || new FileInfo(nupkgFilename).LastWriteTimeUtc <= sourceFile.LastWriteTimeUtc())
             {
                 var contentPath = sourceFile.SourceConfigurationOptions
                     .SingleOrDefault(x => x.OptionType == SourceConfigurationOptionType.ContentPath);
@@ -129,20 +129,6 @@ namespace NuPkg4Src
 
                 tempFiles.ForEach(File.Delete);
             }
-        }
-
-        private static IEnumerable<SourceFile> EnumerateSourceFiles(SourceFile sourceFile)
-        {
-            return new[] { new[] { sourceFile } }
-                .Concat(sourceFile.AssociatedSources.Select(x => EnumerateSourceFiles(x)))
-                .SelectMany(x => x);
-        }
-
-        private static DateTime LastWriteTimeUtc(SourceFile sourceFile)
-        {
-            return new[] { File.GetLastWriteTimeUtc(sourceFile.FullPath) }
-                .Concat(sourceFile.AssociatedSources.Select(x => LastWriteTimeUtc(x)))
-                .Max(x => x);
         }
 
         private static void ConsoleWriteLine(string text, ConsoleColor consoleColor)

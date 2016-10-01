@@ -43,8 +43,6 @@ namespace UserControls
         public ResizeThumb()
         {
             InitializeComponent();
-
-            var resizeTarget = GetResizeTarget(this);
         }
 
         private void ResizeThumbDragStarted(object sender, DragStartedEventArgs e)
