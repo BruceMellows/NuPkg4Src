@@ -7,14 +7,8 @@
 namespace NuPkg4Src
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Globalization;
     using System.IO;
     using System.Linq;
-    using System.Text;
-    using System.Text.RegularExpressions;
-    using System.Xml.Linq;
 
     internal class Program
     {
@@ -24,10 +18,15 @@ namespace NuPkg4Src
 
             foreach (var basePath in commandLineOptions.NonOptionArgs.Select(Path.GetFullPath).Where(Directory.Exists))
             {
-                var sourceFiles = Directory.GetFiles(basePath, "*.cs", SearchOption.AllDirectories)
-                    .SelectMany(x => SourceFile.FromFullPath(basePath, x))
-                    .Where(x => x != null)
-                    .ToList();
+                var csharpSourceFiles = Directory.GetFiles(basePath, "*.cs", SearchOption.AllDirectories)
+                    .SelectMany(x => SourceFile.FromCSharpSource(basePath, x))
+                    .ToArray();
+
+                var xamlSourceFiles = Directory.GetFiles(basePath, "*.xaml", SearchOption.AllDirectories)
+                    .SelectMany(x => SourceFile.FromXamlSource(basePath, x))
+                    .ToArray();
+
+                var sourceFiles = csharpSourceFiles.Concat(xamlSourceFiles).Where(x => x != null).ToList();
 
                 sourceFiles.ForEach(x => x.UpdateDependencies(
                         sourceFiles.ToDictionary(

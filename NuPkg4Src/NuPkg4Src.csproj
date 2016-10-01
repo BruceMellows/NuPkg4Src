@@ -56,6 +56,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>mkdir "$(SolutionDir)Media"
+mkdir "$(SolutionDir)Media\Testing"
 copy /y "$(TargetPath)" "$(SolutionDir)Media\$(TargetFileName)"
 "$(SolutionDir)NuPkg4Src\bin\$(ConfigurationName)\NuPkg4Src.exe" "-NugetPath=$(SolutionDir)Media\nuget.exe" "-OutputDirectory=$(SolutionDir)Media\ExampleLibrary" "$(ProjectDir)."</PostBuildEvent>
   </PropertyGroup>
