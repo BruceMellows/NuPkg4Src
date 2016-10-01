@@ -1,0 +1,86 @@
+<!-- NuPkg4Src-Authors: Bruce Mellows -->
+<!-- NuPkg4Src-Description: UserControls ResizeThumb -->
+<!-- NuPkg4Src-Tags: CSharp Source UserControl ResizeThumb -->
+<!-- NuPkg4Src-Id: UserControl.ResizeThumb -->
+<!-- NuPkg4Src-ContentPath: UserControls.ResizeThumb -->
+<!-- NuPkg4Src-Hash: SHA512Managed:A1E36CCC57D535DB0E456FCD199B66259E452DF4CF0CAA6C2417960AAB94602D387C7A4FE875B2F0D4180EE1ECDA6B15A9FFDF9929744F34CF04905F31962D22 -->
+<!-- NuPkg4Src-Version: 1.0.0 -->
+<!-- There is no copyright, you can use and abuse this source without limit. -->
+<!-- There is no warranty, you are responsible for the consequences of your use of this source. -->
+<!-- There is no burden, you do not need to acknowledge this source in your use of this source. -->
+<UserControl x:Class="UserControls.ResizeThumb"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:UserControls"
+             mc:Ignorable="d"
+             d:DesignHeight="20" d:DesignWidth="20">
+	<UserControl.Resources>
+		<Style x:Key="WindowResizeThumb" TargetType="Thumb">
+			<Setter Property="Focusable" Value="False" />
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="Thumb">
+						<Canvas Width="20" Height="20">
+							<Path
+                                Stroke="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:ResizeThumb}}, Path=Background}"
+                                Fill="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:ResizeThumb}}, Path=Background}"
+                                StrokeThickness="3">
+								<Path.Data>
+									<PathGeometry>
+										<PathGeometry.Figures>
+											<PathFigure StartPoint="0,19" IsClosed="True">
+												<LineSegment Point="19,0" />
+												<LineSegment Point="19,19" />
+											</PathFigure>
+										</PathGeometry.Figures>
+									</PathGeometry>
+								</Path.Data>
+							</Path>
+							<Path
+                                Stroke="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:ResizeThumb}}, Path=Foreground}"
+                                StrokeThickness="3">
+								<Path.Data>
+									<PathGeometry>
+										<PathGeometry.Figures>
+											<PathFigure StartPoint="14,19" IsClosed="False">
+												<LineSegment Point="19,14" />
+											</PathFigure>
+											<PathFigure StartPoint="7,19" IsClosed="False">
+												<LineSegment Point="19,7" />
+											</PathFigure>
+											<PathFigure StartPoint="0,19" IsClosed="False">
+												<LineSegment Point="19,0" />
+											</PathFigure>
+											<!--PathFigure StartPoint="0,12" IsClosed="False">
+                                                <LineSegment Point="12,0" />
+                                            </PathFigure-->
+											<!--PathFigure StartPoint="0,5" IsClosed="False">
+                                                <LineSegment Point="5,0" />
+                                            </PathFigure-->
+										</PathGeometry.Figures>
+									</PathGeometry>
+								</Path.Data>
+							</Path>
+						</Canvas>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+			<Style.Triggers>
+				<Trigger Property="IsMouseOver" Value="True">
+					<Setter Property="Cursor" Value="SizeNWSE" />
+				</Trigger>
+			</Style.Triggers>
+		</Style>
+	</UserControl.Resources>
+	<Thumb
+                    Grid.Column="1"
+                    Name="WindowResizeThumb"
+                    Style="{StaticResource WindowResizeThumb}"
+                    VerticalAlignment="Bottom"
+                    HorizontalAlignment="Right"
+                    DragStarted="ResizeThumbDragStarted"
+                    DragDelta="ResizeThumbDragDelta"
+                    DragCompleted="ResizeThumbDragCompleted" />
+</UserControl>

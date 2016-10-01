@@ -17,6 +17,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleLibrary", "ExampleLi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PInvoke", "PInvoke\PInvoke.csproj", "{39D62DDE-10E6-4B51-84AB-8F8CAB792754}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserControls", "UserControls\UserControls.csproj", "{CE150F1E-AF00-4A1A-B44C-A804DE9CAD09}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CDA73062-562C-4E1F-A145-F15B543374FC} = {CDA73062-562C-4E1F-A145-F15B543374FC}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = NuPkg4Src.vsmdi
@@ -60,6 +65,16 @@ Global
 		{39D62DDE-10E6-4B51-84AB-8F8CAB792754}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{39D62DDE-10E6-4B51-84AB-8F8CAB792754}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{39D62DDE-10E6-4B51-84AB-8F8CAB792754}.Release|x86.ActiveCfg = Release|Any CPU
+		{CE150F1E-AF00-4A1A-B44C-A804DE9CAD09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE150F1E-AF00-4A1A-B44C-A804DE9CAD09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE150F1E-AF00-4A1A-B44C-A804DE9CAD09}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{CE150F1E-AF00-4A1A-B44C-A804DE9CAD09}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{CE150F1E-AF00-4A1A-B44C-A804DE9CAD09}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CE150F1E-AF00-4A1A-B44C-A804DE9CAD09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE150F1E-AF00-4A1A-B44C-A804DE9CAD09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE150F1E-AF00-4A1A-B44C-A804DE9CAD09}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{CE150F1E-AF00-4A1A-B44C-A804DE9CAD09}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{CE150F1E-AF00-4A1A-B44C-A804DE9CAD09}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
