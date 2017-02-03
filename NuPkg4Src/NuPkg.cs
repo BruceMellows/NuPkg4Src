@@ -163,15 +163,18 @@ namespace NuPkg4Src
                 }
             }
 
-            var dependenciesName = SourceConfigurationOptionType.Dependencies.ToString();
-            yield return new XElement(
-                NuspecNamespace + dependenciesName.Substring(0, 1).ToLowerInvariant() + dependenciesName.Substring(1),
-                dependencyValues
-                    .Select(x => DependencyRegex.Matches(x)[0])
-                    .Select(x => new XElement(
-                        NuspecNamespace + "dependency",
-                        new XAttribute("id", x.Groups["dependency"].Value),
-                        new XAttribute("version", x.Groups["versionRange"].Value))));
+            if (dependencyValues.Any())
+            {
+                var dependenciesName = SourceConfigurationOptionType.Dependencies.ToString();
+                yield return new XElement(
+                    NuspecNamespace + dependenciesName.Substring(0, 1).ToLowerInvariant() + dependenciesName.Substring(1),
+                    dependencyValues
+                        .Select(x => DependencyRegex.Matches(x)[0])
+                        .Select(x => new XElement(
+                            NuspecNamespace + "dependency",
+                            new XAttribute("id", x.Groups["dependency"].Value),
+                            new XAttribute("version", x.Groups["versionRange"].Value))));
+            }
         }
     }
 }

@@ -296,6 +296,34 @@ namespace NuPkg4Src
 
                 yield return patchedSourceFile;
             }
+
+            if (sourceFile.SourceConfigurationOptions.Any(x => x.OptionType == SourceConfigurationOptionType.ExternalSourceDependencies))
+            {
+                var nodepSourceFile = new SourceFile
+                {
+                    BasePath = sourceFile.BasePath,
+                    RelativePath = sourceFile.RelativePath,
+                    Lines = sourceFile.Lines.ToList(),
+                    Hash = sourceFile.Hash,
+                    SourceConfigurationOptions = sourceFile.SourceConfigurationOptions,
+                    LastWriteTimeUtc = sourceFile.LastWriteTimeUtc,
+                    AssociatedSources = sourceFile.AssociatedSources,
+                };
+
+                // nodep
+                var idOption = new SourceConfigurationOption(
+                    SourceConfigurationOptionType.Id,
+                    nodepSourceFile.SourceConfigurationOptions.Single(x => x.OptionType == SourceConfigurationOptionType.Id).Value + ".nodep");
+                var variantOption = new SourceConfigurationOption(SourceConfigurationOptionType.Variant, "nodep");
+                nodepSourceFile.SourceConfigurationOptions = nodepSourceFile.SourceConfigurationOptions
+                    .Where(x => x.OptionType != SourceConfigurationOptionType.Id
+                        && x.OptionType != SourceConfigurationOptionType.Variant
+                        && x.OptionType != SourceConfigurationOptionType.ExternalSourceDependencies)
+                    .Concat(new[] { idOption, variantOption })
+                    .ToList();
+
+                yield return nodepSourceFile;
+            }
         }
     }
 }
