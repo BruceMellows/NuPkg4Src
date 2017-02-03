@@ -14,6 +14,7 @@ namespace NuPkg4Src
 
     internal sealed class CommandLineOptions
     {
+        private const string VerboseOption = "-verbose";
         private const string NugetOption = "-nugetpath=";
         private const string TempOption = "-tempdirectory=";
         private const string OutputPathOption = "-outputdirectory=";
@@ -30,7 +31,8 @@ namespace NuPkg4Src
 
         private void Add(string arg)
         {
-            if (!ExtractOption(arg, NugetOption, x => this.NugetPath = x)
+            if (!ExtractOption(arg, VerboseOption, x => this.VerboseText = x)
+                && !ExtractOption(arg, NugetOption, x => this.NugetPath = x)
                 && !ExtractOption(arg, TempOption, x => this.TempPath = x)
                 && !ExtractOption(arg, OutputPathOption, x => this.OutputPath = x))
             {
@@ -40,6 +42,22 @@ namespace NuPkg4Src
 
         public IEnumerable<string> NonOptionArgs { get { return this.nonOptionArgs; } }
 
+        public bool Verbose { get; private set; }
+
+        public string VerboseText
+        {
+            get
+            {
+                return this.Verbose.ToString();
+            }
+
+            private set
+            {
+                bool temp;
+                this.Verbose = bool.TryParse(value, out temp) ? temp : false;
+            }
+        }
+
         public string NugetPath { get; private set; }
 
         public string TempPath { get; private set; }
@@ -48,10 +66,20 @@ namespace NuPkg4Src
 
         private static bool ExtractOption(string arg, string longOption, Action<string> assignValue)
         {
+            if (!longOption.EndsWith("=") && arg.ToLowerInvariant() == longOption)
+            {
+                assignValue(true.ToString());
+                return true;
+            }
+
+
             if (!arg.ToLowerInvariant().StartsWith(longOption) || arg.Length <= longOption.Length)
+            {
                 return false;
+            }
 
             assignValue(arg.Substring(longOption.Length));
+
             return true;
         }
 

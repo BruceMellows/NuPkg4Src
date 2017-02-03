@@ -33,7 +33,7 @@ namespace NuPkg4Src
         private const string regexPartIdentifier = @"(?<identifier>[a-zA-Z_][a-zA-Z0-9_]*)";
         private const string regexPartModifiers = @"((?<modifier>new|public|protected|internal|private|abstract|sealed|static)\s+)+";
         private const string regexPartPartialOpt = @"((?<partial>partial)\s+)?";
-        private const string regexPartClass = @"(?<class>class)\s+";
+        private const string regexPartClass = @"(?<class>class|interface)\s+";
         private const string regexPartClassName = "(?<className>" + regexPartIdentifier + @")\s*";
         private const string regexPartGenericType = @"(?<genericType>" + regexPartIdentifier + @")\s*";
         private const string regexPartGenerics = @"(?<generics><\s*" + regexPartGenericType + @"(,\s*" + regexPartGenericType + @")*>)?\s*";
@@ -124,21 +124,17 @@ namespace NuPkg4Src
                 })
                 .ToList();
 
-            var dependencies = string.Join(
-                " ",
-                this.SourceConfigurationOptions
+            var dependencies = this.SourceConfigurationOptions
                     .Where(x => x.OptionType == SourceConfigurationOptionType.Dependencies)
                     .Select(x => x.Value.Split(' '))
                     .SelectMany(x => x)
-                    .Concat(sourceDependencies));
+                    .Concat(sourceDependencies)
+                    .Where(x => !string.IsNullOrEmpty(x));
 
-            if (!string.IsNullOrEmpty(dependencies))
-            {
-                this.SourceConfigurationOptions = this.SourceConfigurationOptions
-                   .Where(x => x.OptionType != SourceConfigurationOptionType.Dependencies)
-                   .Concat(new[] { new SourceConfigurationOption(SourceConfigurationOptionType.Dependencies, dependencies) })
-                   .ToList();
-            }
+            this.SourceConfigurationOptions = this.SourceConfigurationOptions
+               .Where(x => x.OptionType != SourceConfigurationOptionType.Dependencies)
+               .Concat(dependencies.Select(x => new SourceConfigurationOption(SourceConfigurationOptionType.Dependencies, x)))
+               .ToList();
         }
 
         private static IEnumerable<SourceFile> FromSource(
