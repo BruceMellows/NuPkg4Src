@@ -111,16 +111,24 @@ namespace NuPkg4Src
 
             var sourceDependencies = internalSourceDependencyIds
                 .Concat(externalSourceDependencyIds)
-                .Select(x => sourceFileLookup[x].SourceConfigurationOptions)
                 .Select(x =>
                 {
-                    var version = Version.Parse(x.Single(y => y.OptionType == SourceConfigurationOptionType.Version).Value);
+                    var baseFile = x.Split(',').First();
+                    if (x.Length != baseFile.Length)
+                    {
+                        // version supplied
+                        return x;
+                    }
+
+                    // create version to match this files version
+                    var options = sourceFileLookup[baseFile].SourceConfigurationOptions;
+                    var version = Version.Parse(options.Single(y => y.OptionType == SourceConfigurationOptionType.Version).Value);
 
                     return string.Format(
-                    "[{0},{1}),{2}",
-                    version,
-                    new Version(version.Major, version.Minor + 1),
-                    x.Single(y => y.OptionType == SourceConfigurationOptionType.Id).Value);
+                        "{0}[{1},{2})",
+                        options.Single(y => y.OptionType == SourceConfigurationOptionType.Id).Value,
+                        version,
+                        new Version(version.Major, version.Minor + 1));
                 })
                 .ToList();
 
@@ -324,6 +332,11 @@ namespace NuPkg4Src
 
                 yield return nodepSourceFile;
             }
+        }
+
+        public override string ToString()
+        {
+            return this.RelativePath;
         }
     }
 }

@@ -28,7 +28,7 @@ namespace NuPkg4Src
             SourceConfigurationOptionType.Variant,
         };
 
-        private static readonly Regex DependencyRegex = new Regex(@"^(?<versionRange>[^,]+,[^,]+),(?<dependency>.*)$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        private static readonly Regex DependencyRegex = new Regex(@"^(?<dependency>[^[(]+)(?<versionRange>[[(][^,]+,[^])]+[\])])?$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         private const string NuspecNamespaceText = "http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd";
 
@@ -127,6 +127,11 @@ namespace NuPkg4Src
                         nuspecProcess.WaitForExit();
                         nuspecProcess.OutputDataReceived -= onOutput;
                         nuspecProcess.ErrorDataReceived -= onError;
+
+                        if (nuspecProcess.ExitCode != 0 && !commandLineOptions.Verbose)
+                        {
+                            File.ReadAllLines(nuspecFilename).ToList().ForEach(Console.WriteLine);
+                        }
                     }
 
                     File.Delete(nuspecFilename);
