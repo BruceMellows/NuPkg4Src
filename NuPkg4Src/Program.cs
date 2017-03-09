@@ -39,8 +39,18 @@ namespace NuPkg4Src
                             y => y)));
 
                 // FIXME - can do this in parallel
-                sourceFiles.ForEach(x => NuPkg.Create(commandLineOptions, x));
+                var results = sourceFiles.AsParallel().Select(x => NuPkg.Create(commandLineOptions, x)).ToList();
+
+                results.ForEach(result => result.ToList().ForEach(Output));
             }
+        }
+
+        private static void Output(OutputItem item)
+        {
+            var temp = Console.ForegroundColor;
+            Console.ForegroundColor = item.Category == OutputCategory.Standard ? Console.ForegroundColor : ConsoleColor.Red;
+            Console.WriteLine(item.Line);
+            Console.ForegroundColor = temp;
         }
 
         private static void Main(string[] args)
@@ -51,8 +61,7 @@ namespace NuPkg4Src
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
-                throw;
+                Output(OutputItem.Error(ex.ToString()));
             }
         }
     }

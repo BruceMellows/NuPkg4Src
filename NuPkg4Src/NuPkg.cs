@@ -34,13 +34,16 @@ namespace NuPkg4Src
 
         private static readonly XNamespace NuspecNamespace = NuspecNamespaceText;
 
-        public static void Create(CommandLineOptions commandLineOptions, SourceFile sourceFile)
+        public static IEnumerable<OutputItem> Create(CommandLineOptions commandLineOptions, SourceFile sourceFile)
         {
-            var tempFiles = new List<string>();
+            var tempPath = Path.Combine(commandLineOptions.TempPath, Guid.NewGuid().ToString("D"));
+            Directory.CreateDirectory(tempPath);
+
+            var result = new List<OutputItem>();
             var sourceFiles = sourceFile.GetAll().ToList();
 
             var id = sourceFile.SourceConfigurationOptions.Single(x => x.OptionType == SourceConfigurationOptionType.Id).Value;
-            var nuspecFilename = Path.Combine(commandLineOptions.TempPath, id + ".nuspec");
+            var nuspecFilename = Path.Combine(tempPath, id + ".nuspec");
 
             var version = sourceFile.SourceConfigurationOptions.Single(x => x.OptionType == SourceConfigurationOptionType.Version).Value;
             var nupkgFilename = Path.Combine(commandLineOptions.OutputPath, id + "." + version + ".nupkg");
@@ -55,8 +58,7 @@ namespace NuPkg4Src
                     var fileElements = new List<XElement>();
                     sourceFiles.ForEach(x =>
                     {
-                        var tempFile = Path.Combine(commandLineOptions.TempPath, Path.GetFileName(x.RelativePath));
-                        tempFiles.Add(tempFile);
+                        var tempFile = Path.Combine(tempPath, Path.GetFileName(x.RelativePath));
 
                         File.WriteAllLines(tempFile, x.Lines);
                         fileElements.Add(
@@ -89,7 +91,7 @@ namespace NuPkg4Src
 
                     if (commandLineOptions.Verbose)
                     {
-                        File.ReadAllLines(nuspecFilename).ToList().ForEach(Console.WriteLine);
+                        result.AddRange(File.ReadAllLines(nuspecFilename).Select(OutputItem.Standard));
                     }
 
                     // launch nuspec creator
@@ -102,51 +104,21 @@ namespace NuPkg4Src
                             nuspecFilename,
                             commandLineOptions.OutputPath,
                             sourceFile.BasePath);
-                        Console.WriteLine(arguments);
-                        var nuspecProcess = new Process
-                        {
-                            StartInfo =
-                            {
-                                FileName = nugetExe,
-                                Arguments = arguments,
-                                UseShellExecute = false,
-                                CreateNoWindow = true,
-                                RedirectStandardOutput = true,
-                                RedirectStandardError = true,
-                            }
-                        };
 
-                        var onOutput = new DataReceivedEventHandler(new Action<object, DataReceivedEventArgs>((sender, args) => { ConsoleWriteLine(args.Data, Console.ForegroundColor); }));
-                        var onError = new DataReceivedEventHandler(new Action<object, DataReceivedEventArgs>((sender, args) => { ConsoleWriteLine(args.Data, ConsoleColor.Red); }));
+                        result.Add(OutputItem.Standard(arguments));
 
-                        nuspecProcess.OutputDataReceived += onOutput;
-                        nuspecProcess.ErrorDataReceived += onError;
-                        nuspecProcess.Start();
-                        nuspecProcess.BeginErrorReadLine();
-                        nuspecProcess.BeginOutputReadLine();
-                        nuspecProcess.WaitForExit();
-                        nuspecProcess.OutputDataReceived -= onOutput;
-                        nuspecProcess.ErrorDataReceived -= onError;
-
+                        var nuspecProcess = new ConsoleExecute(nugetExe, arguments);
                         if (nuspecProcess.ExitCode != 0 && !commandLineOptions.Verbose)
                         {
-                            File.ReadAllLines(nuspecFilename).ToList().ForEach(Console.WriteLine);
+                            result.AddRange(File.ReadAllLines(nuspecFilename).Select(OutputItem.Standard));
                         }
                     }
-
-                    File.Delete(nuspecFilename);
                 }
-
-                tempFiles.ForEach(File.Delete);
             }
-        }
 
-        private static void ConsoleWriteLine(string text, ConsoleColor consoleColor)
-        {
-            var temp = Console.ForegroundColor;
-            Console.ForegroundColor = consoleColor;
-            Console.WriteLine(text);
-            Console.ForegroundColor = temp;
+            Directory.Delete(tempPath, true);
+
+            return result;
         }
 
         private static IEnumerable<XElement> OptionsToElements(IEnumerable<SourceConfigurationOption> options)
