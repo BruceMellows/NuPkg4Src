@@ -18,6 +18,14 @@ namespace NuPkg4Src
 
     internal class NuPkg
     {
+        public sealed class DependencyParseException : Exception
+        {
+            public DependencyParseException(string message)
+                : base(message)
+            {
+            }
+        }
+
         private readonly static HashSet<SourceConfigurationOptionType> excludedFromMetadata = new HashSet<SourceConfigurationOptionType>
         {
             SourceConfigurationOptionType.Hash,
@@ -142,11 +150,18 @@ namespace NuPkg4Src
 
             if (dependencyValues.Any())
             {
+                var dependencyValueMatches = dependencyValues.Select(x => Tuple.Create(x, DependencyRegex.Matches(x))).ToArray();
+                var dependencyValueMatchErrors = dependencyValueMatches.Where(x => x.Item2.Count != 0).ToArray();
+                if (dependencyValueMatchErrors.Any())
+                {
+                    throw new DependencyParseException(string.Join(", ", dependencyValueMatchErrors.Select(x => "\"" + x.Item1 + "\"")));
+                }
+
                 var dependenciesName = SourceConfigurationOptionType.Dependencies.ToString();
                 yield return new XElement(
                     NuspecNamespace + dependenciesName.Substring(0, 1).ToLowerInvariant() + dependenciesName.Substring(1),
-                    dependencyValues
-                        .Select(x => DependencyRegex.Matches(x)[0])
+                    dependencyValueMatches
+                        .Select(x => x.Item2[0])
                         .Select(x => new XElement(
                             NuspecNamespace + "dependency",
                             new XAttribute("id", x.Groups["dependency"].Value),

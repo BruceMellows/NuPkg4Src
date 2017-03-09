@@ -53,6 +53,35 @@ namespace NuPkg4Src
             Console.ForegroundColor = temp;
         }
 
+        private static int ReportException(NuPkg.DependencyParseException ex)
+        {
+            Output(OutputItem.Error("Dependency parse error in the following items: " + ex.Message));
+
+            return 1;
+        }
+
+        private static int ReportException(AggregateException ex)
+        {
+            return ex.InnerExceptions.Sum(x => ReportGeneralException(x));
+        }
+
+        private static int ReportGeneralException(Exception ex)
+        {
+            var aggregateException = ex as AggregateException;
+            if (aggregateException != null)
+            {
+                return ReportException(aggregateException);
+            }
+
+            var dependencyParseException = ex as NuPkg.DependencyParseException;
+            if (dependencyParseException != null)
+            {
+                return ReportException(dependencyParseException);
+            }
+
+            return 0;
+        }
+
         private static void Main(string[] args)
         {
             try
@@ -61,7 +90,10 @@ namespace NuPkg4Src
             }
             catch (Exception ex)
             {
-                Output(OutputItem.Error(ex.ToString()));
+                if (0 == ReportGeneralException(ex))
+                {
+                    Output(OutputItem.Error(ex.ToString()));
+                }
             }
         }
     }
