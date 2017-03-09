@@ -16,6 +16,11 @@ namespace NuPkg4Src
         {
             CommandLineOptions commandLineOptions = new CommandLineOptions(args);
 
+            if (commandLineOptions.Verbose)
+            {
+                Console.WriteLine("{0} {1}", System.Reflection.Assembly.GetEntryAssembly().Location, string.Join(" ", args.Select(x => '"' + x + '"')));
+            }
+
             foreach (var basePath in commandLineOptions.NonOptionArgs.Select(Path.GetFullPath).Where(Directory.Exists))
             {
                 var csharpSourceFiles = Directory.GetFiles(basePath, "*.cs", SearchOption.AllDirectories)
